@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gauss-Seidel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <style>
+    * {
+      font-family: "Poppins", sans-serif;
+    }
+  </style>
+  <body class="bg-slate-950 min-h-screen">
+    <nav class="bg-slate-900 border-gray-200 fixed w-full dark:bg-gray-900 z-50">
+      <div
+        class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4"
+      >
+        <a
+          href="https://flowbite.com/"
+          class="flex items-center space-x-3 rtl:space-x-reverse"
+        >
+          <span
+            class="self-center text-2xl font-bold whitespace-nowrap text-white"
+            >Gauss-<span class="text-[#f3c623]">Seidel</span></span
+          >
+        </a>
+        <button
+          data-collapse-toggle="navbar-default"
+          type="button"
+          class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+          aria-controls="navbar-default"
+          aria-expanded="false"
+        >
+          <span class="sr-only">Open main menu</span>
+          <svg
+            class="w-5 h-5"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 17 14"
+          >
+            <path
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M1 1h15M1 7h15M1 13h15"
+            />
+          </svg>
+        </button>
+        <div class="hidden w-full md:block md:w-auto" id="navbar-default">
+          <ul
+            class="font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-transparent md:flex-row md:gap-10 rtl:space-x-reverse md:mt-0 md:border-0"
+          >
+            <li>
+              <a
+                href="#home"
+                class="text-white hover:text-[#f3c623] active:text-[#f3c623] ease-in-out duration-300"
+                aria-current="page"
+                >Home</a
+              >
+            </li>
+            <li>
+              <a
+                href="#about"
+                class="text-white hover:text-[#f3c623] active:text-[#f3c623] ease-in-out duration-300"
+                >Our Team</a
+              >
+            </li>
+            <li>
+              <a
+                href="#calculate"
+                class="text-white hover:text-[#f3c623] active:text-[#f3c623] ease-in-out duration-300"
+                >Calculate</a
+              >
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- home start -->
+    <section id="home" class="max-w-screen-xl mx-auto h-screen">
+      <div class="container flex w-full justify-center items-center pt-24 mx-4">
+        <div class="flex w-full">
+          <div class="w-1/2 items-center flex flex-col gap-6">
+            <div class="flex gap-4 w-full">
+              <img
+                class="border-[3px] border-white w-[160px]"
+                src="{{ url_for('static', filename='img/Carl Friedrich Gauss.jpeg') }}"
+                alt="Carl Friedrich Gauss"
+              />
+              <div
+                class="flex flex-col items-start justify-center w-full h-full"
+              >
+                <h1 class="text-white text-6xl">Metode</h1>
+                <h1 class="text-white text-6xl">
+                  Gauss-<span class="text-[#f3c623]">Seidel</span>
+                </h1>
+              </div>
+            </div>
+            <div class="flex flex-col">
+              <p class="text-white text-justify">
+                Gauss seidel merupakan metode iteratif yang memperbarui nilai
+                variabel secara langsung setiap kali iterasi berlangsung. Berbeda
+                dengan jacobi, gauss seidel ini menggunakan hasil terbaru dari
+                variabel yang dihitung yang kemudian digunakan kepada variabel
+                selanjutnya, sehingga proses konvergen yang akan dihasilkan lebih
+                cepat dalam komputasi.
+              </p>
+              <p class="text-white mt-2">Bentuk Persamaan Linear :</p>
+              <img src="{{ url_for('static', filename='img/Metnum.png') }}" 
+              class="w-[300px]"
+              alt="" />
+              <p class="text-white mt-2">Rumus Umum :</p>
+              <img src="{{ url_for('static', filename='img/Metnum1 1.png') }}" 
+              class="w-[500px]"
+              alt="" />
+            </div>
+          </div>
+          <div class="w-1/2 flex justify-center items-start">
+            <div class="relative">
+              <img
+                class="w-[400px]"
+                src="{{ url_for('static', filename='img/graph.png') }}"
+                alt="Graph"
+              />
+              <svg
+                width="430"
+                height="447"
+                viewBox="0 0 430 447"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                class="absolute -z-10 top-0 left-4"
+              >
+                <g filter="url(#filter0_f_155_4293)">
+                  <circle cx="215.5" cy="223.5" r="124.5" fill="#f3c623" />
+                </g>
+                <defs>
+                  <filter
+                    id="filter0_f_155_4293"
+                    x="-8"
+                    y="0"
+                    width="447"
+                    height="447"
+                    filterUnits="userSpaceOnUse"
+                    color-interpolation-filters="sRGB"
+                  >
+                    <feFlood flood-opacity="0" result="BackgroundImageFix" />
+                    <feBlend
+                      mode="normal"
+                      in="SourceGraphic"
+                      in2="BackgroundImageFix"
+                      result="shape"
+                    />
+                    <feGaussianBlur
+                      stdDeviation="49.5"
+                      result="effect1_foregroundBlur_155_4293"
+                    />
+                  </filter>
+                </defs>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- home end -->
+
+    <!-- about start -->
+    <section id="about" class="h-screen max-w-screen-xl mx-auto">
+      <div class="container flex flex-col w-full justify-center items-center pt-24 mx-4">
+        <h1 class="text-white text-4xl text-center font-bold">Our Team</h1>
+        <div class="h-full w-full flex justify-between mt-20">
+          <div class="flex flex-col justify-center items-center" data-aos-duration="1500" data-aos="zoom-in-right">
+            <img class="w-[280px] h-[280px] border-[3px] border-white rounded-full object-cover"
+            src="{{ url_for('static', filename='img/Sa.jpg') }}" alt="">
+            <p class="text-white mt-4 text-xl font-semibold">Ravinasa Deo</p>
+            <p class="text-[#f3c623] font-semibold">2304130048</p>
+          </div>
+          <div class="flex flex-col justify-center items-center" data-aos-duration="1500" data-aos="zoom-in-up">
+             <img class="w-[280px] h-[280px] border-[3px] border-white rounded-full object-cover object-top"
+            src="{{ url_for('static', filename='img/Wes.jpg') }}" alt="">
+            <p class="text-white mt-4 text-xl font-semibold">Satriya Cahyo Wisely</p>
+            <p class="text-[#f3c623] font-semibold">2304130053</p>
+          </div>
+          <div class="flex flex-col justify-center items-center" data-aos-duration="1500" data-aos="zoom-in-down"> 
+            <img class="w-[280px] h-[280px] border-[3px] border-white rounded-full object-cover"
+            src="{{ url_for('static', filename='img/Roi.jpg') }}" alt="">
+            <p class="text-white mt-4 text-xl font-semibold">Muhammad Zuhrifar Roihan</p>
+            <p class="text-[#f3c623] font-semibold">2304130055</p>
+          </div>
+          <div class="flex flex-col justify-center items-center" data-aos-duration="1500" data-aos="zoom-in-left"> 
+            <img class="w-[280px] h-[280px] border-[3px] border-white rounded-full object-cover object-top"
+            src="{{ url_for('static', filename='img/Yan.jpg') }}" alt="">
+            <p class="text-white mt-4 text-xl font-semibold">Zhahiran Abyan Muhsin</p>
+            <p class="text-[#f3c623] font-semibold">2304130065</p>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- about end -->
+
+    <section id="calculate" class="h-screen max-w-screen-xl mx-auto">
+    <h1 class="text-white text-5xl text-center font-bold mb-12">Calculate Gauss-Seidel Method</h1>
+      
+    <div class="flex flex-col md:flex-row min-h-screen w-full">
+      <!-- Sidebar -->
+      <aside
+        class="md:w-80 w-full bg-slate-900 shadow-md p-8 flex flex-col items-center mt-10 mb-40 rounded-lg max-h-[550px]"
+      >
+        <h1 class="text-2xl font-bold mb-6 text-center text-slate-50">
+          Input Gauss-Seidel
+        </h1>
+        <form method="POST" class="w-full">
+          <div class="mb-3">
+            <label class="font-medium text-slate-50">Jumlah Variabel</label>
+            <input
+              type="number"
+              min="2"
+              max="10"
+              name="n"
+              value="{{ n }}"
+              class="border rounded p-1 w-16 text-center ml-2"
+              onchange="window.location.href='/?n='+this.value"
+            />
+          </div>
+          <div class="mb-4">
+            <label class="font-medium text-slate-50"
+              >Nama Variabel & Persamaan</label
+            >
+            <div class="grid grid-cols-1 gap-2 mt-1">
+              {% for i in range(n) %}
+              <div class="flex items-center gap-2">
+                <input
+                  required
+                  name="var{{i}}"
+                  value="{% if variables and i < variables|length %}{{ variables[i] }}{% elif n == 3 %}{{ ['x','y','z'][i] }}{% else %}x{{ i+1 }}{% endif %}"
+                  class="border rounded p-1 w-12 text-center text-white"
+                  maxlength="5"
+                />
+                <input
+                  required
+                  name="eq{{i}}"
+                  value="{{ equations[i] if equations and i < equations|length else '' }}"
+                  class="border rounded p-1 w-52 text-white"
+                  placeholder="Contoh: 7x-2y+3z=26"
+                />
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="font-medium text-slate-50">Tebakan awal:</label>
+            <div class="flex flex-wrap gap-2 mt-1 text-white">
+              {% for i in range(n) %}
+              <div>
+                <label class="text-slate-50"
+                  >{{ variables[i] if variables and i < variables|length else
+                  (['x','y','z'][i] if n == 3 else 'x' ~ (i+1)) }}:</label
+                >
+                <input
+                  required
+                  name="x0_{{i}}"
+                  value="{% if x0 and variables and i < variables|length %}{{ x0[variables[i]] }}{% else %}0{% endif %}"
+                  class="border rounded p-1 w-16 text-center ml-1"
+                />
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="text-slate-50">Toleransi (%)</label>
+            <input
+              required
+              name="tol"
+              type="number"
+              step="any"
+              value="{{ tol*100 if tol else 0.05 }}"
+              class="border rounded p-1 w-24 ml-2"
+            />
+          </div>
+          <button
+            type="submit"
+            class="bg-[#f3c623] text-white px-6 py-2 rounded-lg shadow hover:bg-[#ffb22c] font-semibold mt-2 w-full"
+          >
+            Proses
+          </button>
+        </form>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="flex-1 flex flex-col items-center px-8 py-8">
+        <h1 class="text-2xl text-slate-50 font-bold mb-4 text-center md:hidden">
+          Metode Gauss-Seidel (Universal n Variabel)
+        </h1>
+        {% if iter_table %}
+        <!-- Hilangkan bg-white shadow-xl p-4 rounded-xl -->
+        <h2 class="font-bold text-lg mb-2 text-slate-50">Tabel Iterasi</h2>
+        <div class="overflow-x-auto w-full rounded-xl max-h-96">
+          <table class="w-full border text-sm bg-white rounded-xl">
+            <thead>
+              <tr class="bg-yellow-400">
+                <th class="p-1 border">Iterasi</th>
+                {% for v in variables %}
+                <th class="p-1 border">{{ v }}</th>
+                {% endfor %} {% for v in variables %} 
+                <th class="p-1 border">E_{{ v }} (%)</th>
+                {% endfor %}
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in iter_table %}
+              <tr
+                class="text-center {% if loop.index0%2==0 %}bg-gray-50{% endif %}"
+              >
+                <td class="border p-1">{{ row.iter }}</td>
+                {% for v in variables %}
+                <td class="border p-1">
+                  {% if v in row['values'] %} {% if row['values'][v] is string
+                  %} {{ row['values'][v] }} {% else %} {{
+                  '%.6f'|format(row['values'][v]) }} {% endif %} {% else %} - {%
+                  endif %}
+                </td>
+                {% endfor %} {% for v in variables %}
+                <td class="border p-1">
+                  {% if v in row['errors'] %} {% if row['errors'][v] is string
+                  %} {{ row['errors'][v] }} {% else %} {{
+                  '%.6f'|format(row['errors'][v]) }} {% endif %} {% else %} - {%
+                  endif %}
+                </td>
+                {% endfor %}
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <h2 class="font-bold mt-4 mb-1 text-slate-50">
+          Chart Error Konvergensi
+        </h2>
+        <canvas
+          id="myChart"
+          width="800"
+          height="350"
+          class="mb-8 bg-slate-50 rounded-xl"
+        ></canvas>
+        <script>
+          {% if error_history %}
+            const labels = Array.from({length: {{ error_history[variables[0]]|length }}}, (_, i) => i);
+            const chartColors = ['#059669', '#2563eb', '#f59e42', '#e11d48', '#d946ef', '#9333ea', '#38bdf8', '#16a34a', '#f43f5e', '#a21caf'];
+            const datasets = [
+              {% for v in variables %}
+              {
+                label: 'Error {{ v }}',
+                data: {{ error_history[v]|tojson }},
+                borderColor: chartColors[{{ loop.index0 }} % chartColors.length],
+                fill: false,
+                tension: 0.2
+              }
+              {% if not loop.last %},{% endif %}
+              {% endfor %}
+            ];
+            const data = {labels, datasets};
+            const config = {
+              type: 'line',
+              data,
+              options: {
+                responsive: true,
+                plugins: {
+                  legend: { position: 'top' },
+                  title: { display: true, text: 'Grafik Konvergensi Error Gauss-Seidel' }
+                },
+                scales: {
+                  y: { type: 'logarithmic', title: { display: true, text: 'Error (%)' } },
+                  x: { title: { display: true, text: 'Iterasi' } }
+                }
+              }
+            };
+            new Chart(document.getElementById('myChart').getContext('2d'), config);
+          {% endif %}
+        </script>
+        <h2 class="font-bold text-slate-50">Solusi Akhir:</h2>
+        <ul class="mb-4 text-slate-50">
+          {% for v in variables %}
+          <li class="font-mono">{{ v }} = {{ "%.6f"|format(solusi[v]) }}</li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+      </main>
+    </div>
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
+    <script>
+  AOS.init();
+</script>
+  </body>
+</html>

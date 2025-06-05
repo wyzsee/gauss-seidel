@@ -1,0 +1,185 @@
+
+    <div class="flex flex-col md:flex-row min-h-screen w-full">
+      <!-- Sidebar -->
+      <aside
+        class="md:w-80 w-full bg-slate-900 shadow-md p-8 flex flex-col items-center"
+      >
+        <h1 class="text-2xl font-bold mb-6 text-center text-slate-50">
+          Input Gauss-Seidel
+        </h1>
+        <form method="POST" class="w-full">
+          <div class="mb-3">
+            <label class="font-medium text-slate-50">Jumlah Variabel</label>
+            <input
+              type="number"
+              min="2"
+              max="10"
+              name="n"
+              value="{{ n }}"
+              class="border rounded p-1 w-16 text-center ml-2"
+              onchange="window.location.href='/?n='+this.value"
+            />
+          </div>
+          <div class="mb-4">
+            <label class="font-medium text-slate-50"
+              >Nama Variabel & Persamaan</label
+            >
+            <div class="grid grid-cols-1 gap-2 mt-1">
+              {% for i in range(n) %}
+              <div class="flex items-center gap-2">
+                <input
+                  required
+                  name="var{{i}}"
+                  value="{% if variables and i < variables|length %}{{ variables[i] }}{% elif n == 3 %}{{ ['x','y','z'][i] }}{% else %}x{{ i+1 }}{% endif %}"
+                  class="border rounded p-1 w-12 text-center text-white"
+                  maxlength="5"
+                />
+                <input
+                  required
+                  name="eq{{i}}"
+                  value="{{ equations[i] if equations and i < equations|length else '' }}"
+                  class="border rounded p-1 w-52 text-white"
+                  placeholder="Contoh: 7x-2y+3z=26"
+                />
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="font-medium text-slate-50">Tebakan awal:</label>
+            <div class="flex flex-wrap gap-2 mt-1 text-white">
+              {% for i in range(n) %}
+              <div>
+                <label class="text-slate-50"
+                  >{{ variables[i] if variables and i < variables|length else
+                  (['x','y','z'][i] if n == 3 else 'x' ~ (i+1)) }}:</label
+                >
+                <input
+                  required
+                  name="x0_{{i}}"
+                  value="{% if x0 and variables and i < variables|length %}{{ x0[variables[i]] }}{% else %}0{% endif %}"
+                  class="border rounded p-1 w-16 text-center ml-1"
+                />
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="text-slate-50">Toleransi (%)</label>
+            <input
+              required
+              name="tol"
+              type="number"
+              step="any"
+              value="{{ tol*100 if tol else 0.05 }}"
+              class="border rounded p-1 w-24 ml-2"
+            />
+          </div>
+          <button
+            type="submit"
+            class="bg-[#f3c623] text-white px-6 py-2 rounded-lg shadow hover:bg-[#ffb22c] font-semibold mt-2 w-full"
+          >
+            Proses
+          </button>
+        </form>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="flex-1 flex flex-col items-center px-8 py-8">
+        <h1 class="text-2xl text-slate-50 font-bold mb-4 text-center md:hidden">
+          Metode Gauss-Seidel (Universal n Variabel)
+        </h1>
+        {% if iter_table %}
+        <!-- Hilangkan bg-white shadow-xl p-4 rounded-xl -->
+        <h2 class="font-bold text-lg mb-2 text-slate-50">Tabel Iterasi</h2>
+        <div class="overflow-auto w-full rounded-xl">
+          <table class="w-full border text-sm bg-white rounded-xl">
+            <thead>
+              <tr class="bg-yellow-400">
+                <th class="p-1 border">Iterasi</th>
+                {% for v in variables %}
+                <th class="p-1 border">{{ v }}</th>
+                {% endfor %} {% for v in variables %}
+                <th class="p-1 border">E_{{ v }} (%)</th>
+                {% endfor %}
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in iter_table %}
+              <tr
+                class="text-center {% if loop.index0%2==0 %}bg-gray-50{% endif %}"
+              >
+                <td class="border p-1">{{ row.iter }}</td>
+                {% for v in variables %}
+                <td class="border p-1">
+                  {% if v in row['values'] %} {% if row['values'][v] is string
+                  %} {{ row['values'][v] }} {% else %} {{
+                  '%.6f'|format(row['values'][v]) }} {% endif %} {% else %} - {%
+                  endif %}
+                </td>
+                {% endfor %} {% for v in variables %}
+                <td class="border p-1">
+                  {% if v in row['errors'] %} {% if row['errors'][v] is string
+                  %} {{ row['errors'][v] }} {% else %} {{
+                  '%.6f'|format(row['errors'][v]) }} {% endif %} {% else %} - {%
+                  endif %}
+                </td>
+                {% endfor %}
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <h2 class="font-bold mt-4 mb-1 text-slate-50">
+          Chart Error Konvergensi
+        </h2>
+        <canvas
+          id="myChart"
+          width="800"
+          height="350"
+          class="mb-8 bg-slate-50 rounded-xl"
+        ></canvas>
+        <script>
+          {% if error_history %}
+            const labels = Array.from({length: {{ error_history[variables[0]]|length }}}, (_, i) => i);
+            const chartColors = ['#059669', '#2563eb', '#f59e42', '#e11d48', '#d946ef', '#9333ea', '#38bdf8', '#16a34a', '#f43f5e', '#a21caf'];
+            const datasets = [
+              {% for v in variables %}
+              {
+                label: 'Error {{ v }}',
+                data: {{ error_history[v]|tojson }},
+                borderColor: chartColors[{{ loop.index0 }} % chartColors.length],
+                fill: false,
+                tension: 0.2
+              }
+              {% if not loop.last %},{% endif %}
+              {% endfor %}
+            ];
+            const data = {labels, datasets};
+            const config = {
+              type: 'line',
+              data,
+              options: {
+                responsive: true,
+                plugins: {
+                  legend: { position: 'top' },
+                  title: { display: true, text: 'Grafik Konvergensi Error Gauss-Seidel' }
+                },
+                scales: {
+                  y: { type: 'logarithmic', title: { display: true, text: 'Error (%)' } },
+                  x: { title: { display: true, text: 'Iterasi' } }
+                }
+              }
+            };
+            new Chart(document.getElementById('myChart').getContext('2d'), config);
+          {% endif %}
+        </script>
+        <h2 class="font-bold text-slate-50">Solusi Akhir:</h2>
+        <ul class="mb-4 text-slate-50">
+          {% for v in variables %}
+          <li class="font-mono">{{ v }} = {{ "%.6f"|format(solusi[v]) }}</li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+      </main>
+    </div>
