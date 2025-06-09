@@ -2,12 +2,7 @@ import os
 import re
 from flask import Flask, render_template, request
 
-# Path absolut ke folder templates dan static
-template_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'templates'))
-static_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'static')) # <-- Ini sekarang akan menunjuk ke folder 'static' yang benar
-
-# Inisialisasi aplikasi Flask
-app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
+app = Flask(__name__)
 
 
 def parse_equation(equation, variables, target_var):
